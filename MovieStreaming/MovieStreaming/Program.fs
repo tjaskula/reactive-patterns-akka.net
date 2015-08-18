@@ -1,7 +1,13 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
+﻿open Akka.Actor
+open System
+
+let system = ActorSystem.Create "MovieStreamingActorSystem"
 
 [<EntryPoint>]
 let main argv = 
-    printfn "%A" argv
+    
+    Console.ReadLine() |> ignore
+
+    system.Shutdown()
+
     0 // return an integer exit code
