@@ -11,11 +11,13 @@ let main argv =
     Console.WriteLine("Actor system created.")
 
     // 1# actor
-    let actor = spawnOpt system "PlaybackActor" <| fun mailbox ->
-        let rec loop() = actor {
-            return! loop()
+    let actor = 
+        spawnOpt system "PlaybackActor" 
+        <| fun mailbox ->
+            let rec loop() = actor {
+                return! loop()
             }
-        loop()
+            loop()
 
     // 2# actor
     let props = Props.Create<PlaybackActor>()
