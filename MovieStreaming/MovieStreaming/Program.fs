@@ -12,16 +12,29 @@ let main argv =
 
     // 1# actor
     let actor = 
-        spawnOpt system "PlaybackActor" 
+        spawn system "PlaybackActor" 
         <| fun mailbox ->
             let rec loop() = actor {
+                let! msg = mailbox.Receive()
+                // TODO : Doesn't work
+//                match msg with
+//                    | :? string as e -> printfn "Received movie title %s" e
+//                    | :? int as i -> ()
+//                    | _ -> ()
                 return! loop()
             }
             loop()
 
+    actor <! "Akka.NET : The Movie"
+    actor <! 42
+
     // 2# actor
     let props = Props.Create<PlaybackActor>()
     let actor2 = system.ActorOf(props, "PlaybackActor2")
+
+    actor2 <! "Akka.NET : The Movie"
+    actor2 <! 42
+    actor2 <! 'c'
 
     Console.ReadLine() |> ignore
 
