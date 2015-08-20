@@ -25,7 +25,7 @@
 
         do
             printfn "Creating Playback Actor typed..."
-            this.Receive<PlayMovieMessage>(fun message -> this.HandlePlayMovieMessage message)
+            this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40))
         
         member this.HandlePlayMovieMessage (message : PlayMovieMessage) : unit =
             printfn "Received typed message - movie title %s and User ID %i" message.MovieTitle message.UserId

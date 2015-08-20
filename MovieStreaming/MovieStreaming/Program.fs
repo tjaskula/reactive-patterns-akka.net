@@ -60,6 +60,7 @@ let main argv =
     let actor4 = system.ActorOf(props, "PlaybackActor4")
 
     actor4 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor4 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 38}
     actor4 <! 48 // TODO : check how unhalded messages are processed in this configuration
 
     Console.ReadLine() |> ignore
