@@ -14,13 +14,13 @@ let main argv =
     let actor = 
         spawn system "PlaybackActor" 
         <| fun mailbox ->
+            printfn "Creating the actor..."
             let rec loop() = actor {
-                let! msg = mailbox.Receive()
-                // TODO : Doesn't work
-//                match msg with
-//                    | :? string as e -> printfn "Received movie title %s" e
-//                    | :? int as i -> ()
-//                    | _ -> ()
+                let! (msg : obj) = mailbox.Receive()
+                match msg with
+                    | :? string as e -> printfn "Received movie title %s" e
+                    | :? int as i -> printfn "Received user ID %i" i
+                    | _ -> mailbox.Unhandled msg
                 return! loop()
             }
             loop()
