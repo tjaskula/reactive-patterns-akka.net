@@ -3,6 +3,7 @@ open Akka.FSharp
 open System
 
 open Actors
+open Messages
 
 [<EntryPoint>]
 let main argv = 
@@ -11,7 +12,7 @@ let main argv =
     Console.WriteLine("Actor system created.")
 
     // 1# actor
-    let actor = 
+    let actor1 = 
         spawn system "PlaybackActor" 
         <| fun mailbox ->
             printfn "Creating the actor..."
@@ -25,8 +26,8 @@ let main argv =
             }
             loop()
 
-    actor <! "Akka.NET : The Movie"
-    actor <! 42
+    actor1 <! "Akka.NET : The Movie"
+    actor1 <! 42
 
     // 2# actor
     let props = Props.Create<PlaybackActor>()
@@ -35,6 +36,24 @@ let main argv =
     actor2 <! "Akka.NET : The Movie"
     actor2 <! 42
     actor2 <! 'c'
+
+    // 3# actor
+    let actor3 = 
+        spawn system "PlaybackActor3" 
+        <| fun mailbox ->
+            printfn "Creating the actor 3..."
+            let rec loop() = actor {
+                let! (msg : obj) = mailbox.Receive()
+                match msg with
+                    | :? PlayMovieMessage as e -> printfn "Received movie title %s and User ID %i" e.MovieTitle e.UserId
+                    | _ -> printfn "Unhadled message..."
+                           mailbox.Unhandled msg
+                return! loop()
+            }
+            loop()
+
+    actor3 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor3 <! 87
 
     Console.ReadLine() |> ignore
 
