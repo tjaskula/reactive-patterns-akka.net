@@ -39,7 +39,7 @@ let main argv =
 
     // 3# actor
     let actor3 = 
-        spawn system "PlaybackActor3" 
+        spawn system "PlaybackActor3"
         <| fun mailbox ->
             printfn "Creating the actor 3..."
             let rec loop() = actor {
@@ -54,6 +54,13 @@ let main argv =
 
     actor3 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
     actor3 <! 87
+
+    // 4# actor
+    let props = Props.Create<PlaybackActorTyped>()
+    let actor4 = system.ActorOf(props, "PlaybackActor4")
+
+    actor4 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor4 <! 48 // TODO : check how unhalded messages are processed in this configuration
 
     Console.ReadLine() |> ignore
 
