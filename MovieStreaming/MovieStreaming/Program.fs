@@ -29,39 +29,42 @@ let main argv =
     actor1 <! "Akka.NET : The Movie"
     actor1 <! 42
 
-    // 2# actor
+    // 1'# actor
     let props = Props.Create<PlaybackActor>()
-    let actor2 = system.ActorOf(props, "PlaybackActor2")
+    let actor1' = system.ActorOf(props, "PlaybackActor1'")
 
-    actor2 <! "Akka.NET : The Movie"
-    actor2 <! 42
-    actor2 <! 'c'
+    actor1' <! "Akka.NET : The Movie"
+    actor1' <! 42
+    actor1' <! 'c'
 
-    // 3# actor
-    let actor3 = 
-        spawn system "PlaybackActor3"
+
+
+
+    // 2# actor
+    let actor2 = 
+        spawn system "PlaybackActor2"
         <| fun mailbox ->
-            printfn "Creating the actor 3..."
-            let rec loop() = actor {
-                let! (msg : obj) = mailbox.Receive()
-                match msg with
-                    | :? PlayMovieMessage as e -> printfn "Received movie title %s and User ID %i" e.MovieTitle e.UserId
+            printfn "Creating the actor 2..."
+            let rec loop() = actor {                
+                let! (msg : PlayMovieMessage) = mailbox.Receive()
+                match msg with // TODO : This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
+                    | m when m.UserId > 40 -> printfn "Received movie title %s and User ID %i" m.MovieTitle m.UserId
                     | _ -> printfn "Unhadled message..."
                            mailbox.Unhandled msg
                 return! loop()
             }
             loop()
 
-    actor3 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
-    actor3 <! 87
+    actor2 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor2 <! 87
 
-    // 4# actor
+    // 2'# actor
     let props = Props.Create<PlaybackActorTyped>()
-    let actor4 = system.ActorOf(props, "PlaybackActor4")
+    let actor2' = system.ActorOf(props, "PlaybackActor2'")
 
-    actor4 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
-    actor4 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 38}
-    actor4 <! 48 // TODO : check how unhalded messages are processed in this configuration
+    actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 38}
+    actor2' <! 48 // Unhandled method is called itself on typed actor
 
     Console.ReadLine() |> ignore
 
