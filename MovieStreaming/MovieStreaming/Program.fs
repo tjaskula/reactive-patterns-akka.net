@@ -65,6 +65,10 @@ let main argv =
 
     Console.ReadLine() |> ignore
 
+    // tells the actor system (and all child actors) to shutdown
     system.Shutdown()
+
+    // wait for actor system to finish shutting down
+    system.AwaitTermination()
 
     0 // return an integer exit code
