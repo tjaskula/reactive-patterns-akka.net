@@ -37,9 +37,6 @@ let main argv =
     actor1' <! 42
     actor1' <! 'c'
 
-
-
-
     // 2# actor
     let actor2 = 
         spawn system "PlaybackActor2"
