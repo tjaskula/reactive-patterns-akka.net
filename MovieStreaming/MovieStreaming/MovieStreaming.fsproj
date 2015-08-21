@@ -56,9 +56,11 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Messages.fs" />
+    <Compile Include="ConsoleHelpers.fs" />
     <Compile Include="Actors.fs" />
     <Compile Include="Program.fs" />
     <None Include="Tests.fsx" />
+    <None Include="Trash.fsx" />
     <None Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>
