@@ -44,7 +44,7 @@ let main argv =
             printfn "Creating the actor 2..."
             let rec loop() = actor {                
                 let! (msg : PlayMovieMessage) = mailbox.Receive()
-                match msg with // TODO : This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
+                match msg with // This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
                     | m when m.UserId > 40 -> printfn "Received movie title %s and User ID %i" m.MovieTitle m.UserId
                     | _ -> printfn "Unhadled message..."
                            mailbox.Unhandled msg
