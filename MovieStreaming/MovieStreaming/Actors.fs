@@ -6,6 +6,7 @@
 
     open System
 
+    open ConsoleHelpers
     open Messages
 
     type PlaybackActor() =    
@@ -16,8 +17,8 @@
 
         override __.OnReceive message =
             match message with
-            | :? string as e -> printfn "Received movie title %s" e
-            | :? int as i -> printfn "Received user ID %i" i
+            | :? string as e -> cprintfn ConsoleColor.Yellow "Received movie title %s" e
+            | :? int as i -> cprintfn ConsoleColor.Yellow "Received user ID %i" i
             | _ -> __.Unhandled(message)
 
     type PlaybackActorTyped() as this =
@@ -28,4 +29,4 @@
             this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40))
         
         member this.HandlePlayMovieMessage (message : PlayMovieMessage) : unit =
-            printfn "Received typed message - movie title %s and User ID %i" message.MovieTitle message.UserId
+            cprintfn ConsoleColor.Yellow "Received typed message - movie title %s and User ID %i" message.MovieTitle message.UserId

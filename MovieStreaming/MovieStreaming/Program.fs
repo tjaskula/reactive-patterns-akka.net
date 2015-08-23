@@ -3,6 +3,7 @@ open Akka.FSharp
 open System
 
 open Actors
+open ConsoleHelpers
 open Messages
 
 [<EntryPoint>]
@@ -19,8 +20,8 @@ let main argv =
             let rec loop() = actor {
                 let! (msg : obj) = mailbox.Receive()
                 match msg with
-                    | :? string as e -> printfn "Received movie title %s" e
-                    | :? int as i -> printfn "Received user ID %i" i
+                    | :? string as e -> cprintfn ConsoleColor.Yellow "Received movie title %s" e
+                    | :? int as i -> cprintfn ConsoleColor.Yellow "Received user ID %i" i
                     | _ -> mailbox.Unhandled msg
                 return! loop()
             }
@@ -45,8 +46,8 @@ let main argv =
             let rec loop() = actor {                
                 let! (msg : PlayMovieMessage) = mailbox.Receive()
                 match msg with // This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
-                    | m when m.UserId > 40 -> printfn "Received movie title %s and User ID %i" m.MovieTitle m.UserId
-                    | _ -> printfn "Unhadled message..."
+                    | m when m.UserId > 40 -> cprintfn ConsoleColor.Yellow "Received movie title %s and User ID %i" m.MovieTitle m.UserId
+                    | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                            mailbox.Unhandled msg
                 return! loop()
             }
