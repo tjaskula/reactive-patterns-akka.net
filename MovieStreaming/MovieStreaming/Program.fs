@@ -64,12 +64,14 @@ let main argv =
     actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 38}
     actor2' <! 48 // Unhandled method is called itself on typed actor
 
-    Console.ReadLine() |> ignore
+    Console.ReadKey() |> ignore
 
     // tells the actor system (and all child actors) to shutdown
     system.Shutdown()
 
     // wait for actor system to finish shutting down
     system.AwaitTermination()
+    Console.WriteLine("Actor system shutdown.")
+    Console.ReadKey() |> ignore
 
     0 // return an integer exit code
