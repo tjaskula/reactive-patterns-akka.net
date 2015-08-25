@@ -27,6 +27,14 @@
         override __.PostStop() =
             cprintfn ConsoleColor.Green "Playback Actor PostStop"
 
+        override __.PreRestart (e, message) =
+            cprintfn ConsoleColor.Green "Playback Actor PreRestart because: %A" e
+            base.PreRestart(e, message)
+
+        override __.PostRestart e =
+            cprintfn ConsoleColor.Green "Playback Actor PostRestart because: %A" e
+            base.PostRestart(e)
+
     type PlaybackActorTyped() as this =
         inherit ReceiveActor()
 
@@ -42,3 +50,11 @@
 
         override __.PostStop() =
             cprintfn ConsoleColor.Green "Playback typed Actor PostStop"
+
+        override __.PreRestart (e, message) =
+            cprintfn ConsoleColor.Green "Playback typed Actor PreRestart because: %A" e
+            base.PreRestart(e, message)
+
+        override __.PostRestart e =
+            cprintfn ConsoleColor.Green "Playback typed Actor PostRestart because: %A" e
+            base.PostRestart(e)
