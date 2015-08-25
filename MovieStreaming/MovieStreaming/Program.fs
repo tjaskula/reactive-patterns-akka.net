@@ -10,13 +10,13 @@ open Messages
 let main argv = 
     
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
-    Console.WriteLine("Actor system created.")
+    cprintfn ConsoleColor.Gray "Actor system created."
 
     // 1# actor
     let actor1 = 
         spawn system "PlaybackActor" 
         <| fun mailbox ->
-            printfn "Creating the actor..."
+            cprintfn ConsoleColor.Gray "Creating the actor..."
             let rec loop() = actor {
                 let! (msg : obj) = mailbox.Receive()
                 match msg with
@@ -42,7 +42,7 @@ let main argv =
     let actor2 = 
         spawn system "PlaybackActor2"
         <| fun mailbox ->
-            printfn "Creating the actor 2..."
+            cprintfn ConsoleColor.Gray "Creating the actor 2..."
             let rec loop() = actor {                
                 let! (msg : PlayMovieMessage) = mailbox.Receive()
                 match msg with // This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
@@ -71,7 +71,7 @@ let main argv =
 
     // wait for actor system to finish shutting down
     system.AwaitTermination()
-    Console.WriteLine("Actor system shutdown.")
+    cprintfn ConsoleColor.Gray "Actor system shutdown."
     Console.ReadKey() |> ignore
 
     0 // return an integer exit code
