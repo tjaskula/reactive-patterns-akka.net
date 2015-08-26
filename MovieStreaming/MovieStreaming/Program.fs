@@ -54,6 +54,9 @@ let main argv =
             loop()
 
     actor2 <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
+    actor2 <! {MovieTitle = "Partial Recall"; UserId = 99}
+    actor2 <! {MovieTitle = "Boolean Lies"; UserId = 77}
+    actor2 <! {MovieTitle = "Codenan the Destroyer"; UserId = 1}
     actor2 <! 87
 
     // 2'# actor
@@ -61,7 +64,9 @@ let main argv =
     let actor2' = system.ActorOf(props, "PlaybackActor2'")
 
     actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
-    actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 38}
+    actor2' <! {MovieTitle = "Partial Recall"; UserId = 99}
+    actor2' <! {MovieTitle = "Boolean Lies"; UserId = 77}
+    actor2' <! {MovieTitle = "Codenan the Destroyer"; UserId = 1}
     actor2' <! 48 // Unhandled method is called itself on typed actor
 
     Console.ReadKey() |> ignore
