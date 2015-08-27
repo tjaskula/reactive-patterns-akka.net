@@ -12,6 +12,12 @@ let main argv =
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
     cprintfn ConsoleColor.Gray "Actor system created."
 
+    (* 
+    =======
+    Untyped
+    =======
+    *)
+
     // 1# actor
     let actor1 = 
         spawn system "PlaybackActor" 
@@ -29,6 +35,12 @@ let main argv =
 
     actor1 <! "Akka.NET : The Movie"
     actor1 <! 42
+
+    (* 
+    =======
+    Typed
+    =======
+    *)
 
     // 1'# actor
     let props = Props.Create<PlaybackActor>()
