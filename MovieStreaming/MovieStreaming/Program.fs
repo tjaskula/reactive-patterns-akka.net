@@ -20,7 +20,7 @@ let main argv =
 
     // 1# actor
     let actor1 = 
-        spawn system "PlaybackActor" 
+        spawn system "PlaybackActor1" 
         <| fun mailbox ->
             cprintfn ConsoleColor.Gray "Creating the actor..."
             let rec loop() = actor {
@@ -44,7 +44,7 @@ let main argv =
 
     // 1'# actor
     let props = Props.Create<PlaybackActor>()
-    let actor1' = system.ActorOf(props, "PlaybackActor1'")
+    let actor1' = system.ActorOf(props, "PlaybackActor1bis")
 
     actor1' <! "Akka.NET : The Movie"
     actor1' <! 42
@@ -70,16 +70,18 @@ let main argv =
     actor2 <! {MovieTitle = "Boolean Lies"; UserId = 77}
     actor2 <! {MovieTitle = "Codenan the Destroyer"; UserId = 1}
     actor2 <! 87
-
+    actor2 <! PoisonPill.Instance
+    
     // 2'# actor
     let props = Props.Create<PlaybackActorTyped>()
-    let actor2' = system.ActorOf(props, "PlaybackActor2'")
+    let actor2' = system.ActorOf(props, "PlaybackActor2bis")
 
     actor2' <! {MovieTitle = "Akka.NET : The Movie"; UserId = 42}
     actor2' <! {MovieTitle = "Partial Recall"; UserId = 99}
     actor2' <! {MovieTitle = "Boolean Lies"; UserId = 77}
     actor2' <! {MovieTitle = "Codenan the Destroyer"; UserId = 1}
     actor2' <! 48 // Unhandled method is called itself on typed actor
+    actor2' <! PoisonPill.Instance
 
     Console.ReadKey() |> ignore
 
