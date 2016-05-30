@@ -86,10 +86,10 @@ let main argv =
     Console.ReadKey() |> ignore
 
     // tells the actor system (and all child actors) to shutdown
-    system.Shutdown()
+    system.Terminate() |> ignore
 
     // wait for actor system to finish shutting down
-    system.AwaitTermination()
+    system.WhenTerminated.Wait(TimeSpan.FromSeconds(2.)) |> ignore
     cprintfn ConsoleColor.Gray "Actor system shutdown."
     Console.ReadKey() |> ignore
 
