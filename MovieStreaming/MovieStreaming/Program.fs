@@ -119,6 +119,53 @@ let main argv =
     actor3 <! 87
     actor3 <! PoisonPill.Instance
 
+    // 4# user actor
+//    let actor4 = 
+//        spawnOvrd system "UserActor"
+//        <| fun mailbox ->
+//            cprintfn ConsoleColor.Gray "Creating the actor 4..."
+//            let rec loop() = actor {                
+//                let! (msg : PlayMovieMessage) = mailbox.Receive()
+//                match msg with
+//                    | m when m.UserId > 40 -> cprintfn ConsoleColor.Yellow "Received movie title %s and User ID %i" m.MovieTitle m.UserId
+//                    | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
+//                           mailbox.Unhandled msg
+//                return! loop()
+//            }
+//            loop()
+//        <| {defOvrd with PreStart = preStart; PostStop = postStop}
+
+//    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
+//    Console.ReadKey() |> ignore
+//    actor4 <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
+//    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
+//    Console.ReadKey() |> ignore
+//    actor4 <! {MovieTitle = "Boolean Lies"; UserId = 42}
+//    actor4 <! 87
+//    actor4 <! PoisonPill.Instance
+
+    Console.ReadKey() |> ignore
+    
+    // 4'# user actor
+    let props = Props.Create<UserActor>()
+    let actor4' = system.ActorOf(props, "UserActorBis")
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
+    actor4' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
+    
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
+    actor4' <! {MovieTitle = "Boolean Lies"; UserId = 42}
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
+    actor4' <! StopMovieMessage()
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
+    actor4' <! StopMovieMessage()
+
     Console.ReadKey() |> ignore
 
     // tells the actor system (and all child actors) to shutdown
