@@ -143,8 +143,6 @@ let main argv =
     let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn)
     let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
 
-    let currentlyWatching = String.Empty
-
     let actor4 = 
         spawnOvrd system "UserActor"
         <| fun mailbox ->
@@ -174,7 +172,7 @@ let main argv =
                                       ""
                 return! loop newState
             }
-            loop currentlyWatching
+            loop String.Empty
         <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
