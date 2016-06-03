@@ -106,38 +106,32 @@
     type UserActorBecome() as this =
         inherit ReceiveActor()
 
+        let mutable currentlyWatching = String.Empty
+
         do
             cprintfn ConsoleColor.Gray "Creating a UserActor"
             cprintfn ConsoleColor.Cyan "Setting initial behavior to stopped"
             this.Stopped()
-          
-        let mutable currentlyWatching = String.Empty
-
-        let startPlayingMovie title =
+     
+        member private this.StartPlayingMovie title =
             currentlyWatching <- title
             cprintfn ConsoleColor.Yellow "User is currently watching %s" currentlyWatching
+            this.Become(this.Playing)
 
-        let stopPlayingCurrentMovie() =
+        member private this.StopPlayingCurrentMovie() =
             cprintfn ConsoleColor.Yellow "User has stopped watching %s" currentlyWatching
             currentlyWatching <- null
-            ()
+            this.Become(this.Stopped)
 
         member private this.Playing() =
-            ()
+            this.Receive<PlayMovieMessage>((fun _ -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"))
+            this.Receive<StopMovieMessage>((fun _ -> this.StopPlayingCurrentMovie()))
+            cprintfn ConsoleColor.Cyan "User Actor has now become Playing"
 
         member private this.Stopped() =
-            ()
-        
-        member this.HandlePlayMovieMessage (message : PlayMovieMessage) : unit =
-            match currentlyWatching with
-            | null | "" -> startPlayingMovie message.MovieTitle
-            | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
-            
-
-        member this.HandleStopMovieMessage (message : StopMovieMessage) : unit =
-            match currentlyWatching with
-            | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
-            | _ -> stopPlayingCurrentMovie()
+            this.Receive<PlayMovieMessage>((fun message -> this.StartPlayingMovie message.MovieTitle))
+            this.Receive<StopMovieMessage>((fun _ -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"))
+            cprintfn ConsoleColor.Cyan "User Actor has now become Stopped"
 
         override __.PreStart() =
             cprintfn ConsoleColor.Green "UserActor PreStart"

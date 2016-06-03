@@ -218,6 +218,31 @@ let main argv =
 
     Console.ReadKey() |> ignore
 
+    // 5'# user actor
+    Console.WriteLine(Environment.NewLine)
+    cprintfn ConsoleColor.Magenta "Starting new actor..."
+
+    let props = Props.Create<UserActorBecome>()
+    let actor5' = system.ActorOf(props, "UserActorBecomeBis")
+  
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
+    actor5' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
+    
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
+    actor5' <! {MovieTitle = "Boolean Lies"; UserId = 42}
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
+    actor5' <! StopMovieMessage()
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
+    actor5' <! StopMovieMessage()
+
+    Console.ReadKey() |> ignore
+
     // tells the actor system (and all child actors) to shutdown
     system.Terminate() |> ignore
 
