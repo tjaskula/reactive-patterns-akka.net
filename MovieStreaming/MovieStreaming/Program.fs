@@ -199,7 +199,7 @@ let main argv =
 
     let props = Props.Create<UserActor>()
     let actor4' = system.ActorOf(props, "UserActorBis")
-
+  
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
     actor4' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
