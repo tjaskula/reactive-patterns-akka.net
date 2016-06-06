@@ -1,7 +1,7 @@
-﻿#I "../packages/Newtonsoft.Json.7.0.1/lib/net45/"
-#r "../packages/Akka.1.0.4/lib/net45/Akka.dll"
-#r "../packages/Akka.FSharp.1.0.4/lib/net45/Akka.FSharp.dll"
-#r "../packages/FsPickler.1.2.21/lib/net45/FsPickler.dll"
+﻿#I "../packages/Newtonsoft.Json.8.0.3/lib/net45/"
+#r "../packages/Akka.1.0.8/lib/net45/Akka.dll"
+#r "../packages/Akka.FSharp.1.0.8/lib/net45/Akka.FSharp.dll"
+#r "../packages/FsPickler.2.2.0/lib/net45/FsPickler.dll"
 #r "Newtonsoft.Json.dll"
 
 open Akka.FSharp

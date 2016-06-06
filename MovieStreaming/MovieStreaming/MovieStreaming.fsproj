@@ -58,6 +58,8 @@
     <Compile Include="Messages.fs" />
     <Compile Include="ConsoleHelpers.fs" />
     <Compile Include="Actors.fs" />
+    <Compile Include="ActorSample1Basic.fs" />
+    <Compile Include="UseCases.fs" />
     <Compile Include="Program.fs" />
     <None Include="Tests.fsx" />
     <None Include="Trash.fsx" />
