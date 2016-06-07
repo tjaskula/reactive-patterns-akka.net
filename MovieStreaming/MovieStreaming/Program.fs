@@ -4,14 +4,38 @@ open ComposeIt.Akka.FSharp.Extensions.Lifecycle
 open System
 
 open Actors
+open ActorConfiguration
 open ConsoleHelpers
 open Messages
 
 [<EntryPoint>]
 let main argv = 
-    
+
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
     cprintfn ConsoleColor.Gray "Actor system created."
+
+    let rec readConsole() =
+
+        Console.WriteLine(Environment.NewLine)
+        Console.WriteLine("Which actor do you want to run?")
+        Console.WriteLine(Environment.NewLine)
+        // actor 1
+        Console.WriteLine("   1. Untyped basic actor F# Api")
+        // actor 1bis
+        Console.WriteLine("   2. Typed basic actor")
+
+        let keyInfo = Console.ReadKey()
+        Console.WriteLine(Environment.NewLine)
+
+        if keyInfo.Key = ConsoleKey.Q then ()
+        else
+            match keyInfo.KeyChar with
+            | '1' -> startActor system 1
+            | '2' -> startActor system 2
+            | _ -> Console.WriteLine "Choice not known"
+            readConsole()
+
+    readConsole()
 
     // 2# actor
     Console.WriteLine(Environment.NewLine)

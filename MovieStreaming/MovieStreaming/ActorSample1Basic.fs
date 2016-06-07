@@ -36,6 +36,7 @@ let start1 system =
 
     actor1 <! "Akka.NET : The Movie"
     actor1 <! 42
+    actor1 <! PoisonPill.Instance
 
     Console.ReadKey() |> ignore
 
@@ -56,3 +57,6 @@ let start2 (system : ActorSystem) =
     actor1' <! "Akka.NET : The Movie"
     actor1' <! 42
     actor1' <! 'c'
+    actor1' <! PoisonPill.Instance
+
+    Console.ReadKey() |> ignore
