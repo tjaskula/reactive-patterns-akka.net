@@ -2,12 +2,10 @@
 
 open Akka.Actor
 open Akka.FSharp
-open ComposeIt.Akka.FSharp.Extensions.Lifecycle
 open System
 
 open Actors
 open ConsoleHelpers
-open Messages
 
 (* 
 =======
