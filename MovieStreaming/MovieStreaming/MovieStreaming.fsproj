@@ -61,6 +61,7 @@
     <Compile Include="ActorSample1.fs" />
     <Compile Include="ActorSample2.fs" />
     <Compile Include="ActorSample3.fs" />
+    <Compile Include="ActorSample4.fs" />
     <Compile Include="UseCases.fs" />
     <Compile Include="Program.fs" />
     <None Include="Tests.fsx" />
