@@ -69,5 +69,28 @@ let start6 system =
 
     Console.ReadKey() |> ignore
 
+let start7 (system : ActorSystem) =
+    // 4'# user actor
+    Console.WriteLine(Environment.NewLine)
+    cprintfn ConsoleColor.Magenta "Starting new actor..."
 
+    let props = Props.Create<UserActor>()
+    let actor4' = system.ActorOf(props, "UserActorBis")
+  
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
+    actor4' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
     
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
+    actor4' <! {MovieTitle = "Boolean Lies"; UserId = 42}
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
+    actor4' <! StopMovieMessage()
+
+    Console.ReadKey() |> ignore
+    cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
+    actor4' <! StopMovieMessage()
+
+    Console.ReadKey() |> ignore    

@@ -31,6 +31,8 @@ let main argv =
         Console.WriteLine("   5. F# Api Actor overriding lifecycles")
         // actor 4
         Console.WriteLine("   6. F# Api Stateful Actor with overriding lifecycles")
+        // actor 4bis
+        Console.WriteLine("   7. Stateful Actor with overriding lifecycles")
 
         let keyInfo = Console.ReadKey()
         Console.WriteLine(Environment.NewLine)
@@ -44,35 +46,11 @@ let main argv =
             | '4' -> startActor system 4
             | '5' -> startActor system 5
             | '6' -> startActor system 6
+            | '7' -> startActor system 7
             | _ -> Console.WriteLine "Choice not known"
             readConsole()
 
     readConsole()
-    
-    // 4'# user actor
-    Console.WriteLine(Environment.NewLine)
-    cprintfn ConsoleColor.Magenta "Starting new actor..."
-
-    let props = Props.Create<UserActor>()
-    let actor4' = system.ActorOf(props, "UserActorBis")
-  
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
-    actor4' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
-    
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
-    actor4' <! {MovieTitle = "Boolean Lies"; UserId = 42}
-
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
-    actor4' <! StopMovieMessage()
-
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
-    actor4' <! StopMovieMessage()
-
-    Console.ReadKey() |> ignore
 
     // 5# user actor
     Console.WriteLine(Environment.NewLine)
