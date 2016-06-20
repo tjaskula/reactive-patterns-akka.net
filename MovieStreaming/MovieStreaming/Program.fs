@@ -36,7 +36,7 @@ let main argv =
         // actor 5
         Console.WriteLine("   8. F# Api Stateful Actor with Become")
         // actor 5bis
-        //Console.WriteLine("   9. Stateful Actor with Become")
+        Console.WriteLine("   9. Stateful Actor with Become")
 
         let keyInfo = Console.ReadKey()
         Console.WriteLine(Environment.NewLine)
@@ -52,37 +52,11 @@ let main argv =
             | '6' -> startActor system 6
             | '7' -> startActor system 7
             | '8' -> startActor system 8
+            | '9' -> startActor system 9
             | _ -> Console.WriteLine "Choice not known"
             readConsole()
 
     readConsole()
-
-    
-
-    // 5'# user actor
-    Console.WriteLine(Environment.NewLine)
-    cprintfn ConsoleColor.Magenta "Starting new actor..."
-
-    let props = Props.Create<UserActorBecome>()
-    let actor5' = system.ActorOf(props, "UserActorBecomeBis")
-  
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
-    actor5' <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
-    
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
-    actor5' <! {MovieTitle = "Boolean Lies"; UserId = 42}
-
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
-    actor5' <! StopMovieMessage()
-
-    Console.ReadKey() |> ignore
-    cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
-    actor5' <! StopMovieMessage()
-
-    Console.ReadKey() |> ignore
 
     // tells the actor system (and all child actors) to shutdown
     system.Terminate() |> ignore
