@@ -24,7 +24,7 @@ let start8 system =
         <| fun mailbox ->
             cprintfn ConsoleColor.Gray "Creating the actor 5..."
             let rec loop lastState = actor {                
-                let! (msg : obj) = mailbox.Receive()
+                let! msg = mailbox.Receive()
 
                 let handlePlayMovieMessage (message : PlayMovieMessage) : string =
                     match lastState with
@@ -41,8 +41,8 @@ let start8 system =
                            String.Empty
 
                 let newState = match msg with
-                               | :? PlayMovieMessage as pmm -> handlePlayMovieMessage pmm
-                               | :? StopMovieMessage as smm -> handleStopMovieMessage smm
+                               | PlayMovie pm -> handlePlayMovieMessage pm
+                               | StopMovie sm -> handleStopMovieMessage sm
                                | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                                       mailbox.Unhandled msg
                                       ""
@@ -53,19 +53,19 @@ let start8 system =
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
-    actor5 <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
+    actor5 <! PlayMovie ({MovieTitle = "Codenan the Destroyer"; UserId = 42})
     
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
-    actor5 <! {MovieTitle = "Boolean Lies"; UserId = 42}
+    actor5 <! PlayMovie ({MovieTitle = "Boolean Lies"; UserId = 42})
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
-    actor5 <! StopMovieMessage()
+    actor5 <! StopMovie
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
-    actor5 <! StopMovieMessage()
+    actor5 <! StopMovie
 
     Console.ReadKey() |> ignore
 
