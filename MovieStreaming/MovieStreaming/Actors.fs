@@ -9,6 +9,10 @@
     open ConsoleHelpers
     open Messages
 
+
+    (*
+        PlaybackActor 
+    *)
     type PlaybackActor() =    
         inherit UntypedActor()
 
@@ -35,6 +39,9 @@
             cprintfn ConsoleColor.Green "Playback Actor PostRestart because: %A" e
             base.PostRestart(e)
 
+    (*
+        PlaybackActorTyped 
+    *)
     type PlaybackActorTyped() as this =
         inherit ReceiveActor()
 
@@ -59,6 +66,9 @@
             cprintfn ConsoleColor.Green "Playback typed Actor PostRestart because: %A" e
             base.PostRestart(e)
 
+    (*
+        UserActor 
+    *)
     type UserActor() as this =
         inherit ReceiveActor()
 
@@ -103,6 +113,9 @@
             cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" e
             base.PostRestart(e)
 
+    (*
+        UserActorBecome 
+    *)
     type UserActorBecome() as this =
         inherit ReceiveActor()
 
