@@ -37,22 +37,25 @@ let main argv =
         Console.WriteLine("   8. F# Api Stateful Actor with Become")
         // actor 5bis
         Console.WriteLine("   9. Stateful Actor with Become")
+        // actor 5ter
+        Console.WriteLine("   10. Stateful Actor with Become F# style")
 
-        let keyInfo = Console.ReadKey()
+        let line = Console.ReadLine()
         Console.WriteLine(Environment.NewLine)
 
-        if keyInfo.Key = ConsoleKey.Q then ()
+        if line = "Q" then ()
         else
-            match keyInfo.KeyChar with
-            | '1' -> startActor system 1
-            | '2' -> startActor system 2
-            | '3' -> startActor system 3
-            | '4' -> startActor system 4
-            | '5' -> startActor system 5
-            | '6' -> startActor system 6
-            | '7' -> startActor system 7
-            | '8' -> startActor system 8
-            | '9' -> startActor system 9
+            match line with
+            | "1" -> startActor system 1
+            | "2" -> startActor system 2
+            | "3" -> startActor system 3
+            | "4" -> startActor system 4
+            | "5" -> startActor system 5
+            | "6" -> startActor system 6
+            | "7" -> startActor system 7
+            | "8" -> startActor system 8
+            | "9" -> startActor system 9
+            | "10" -> startActor system 10
             | _ -> Console.WriteLine "Choice not known"
             readConsole()
 
