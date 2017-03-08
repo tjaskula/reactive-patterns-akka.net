@@ -105,36 +105,13 @@ let start10 (system : ActorSystem) =
     let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn)
     let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
 
+    let rec moviePlayer lastState = function
+        | PlayMovie m -> cprintfn ConsoleColor.DarkYellow "PlayMovie"
+        | StopMovie m -> cprintfn ConsoleColor.DarkYellow "StopMovie"
+    
     let actor5'' = 
         spawnOvrd system "UserActorBecome"
-        <| fun mailbox ->
-            cprintfn ConsoleColor.Gray "Creating the actor 5..."
-            let rec loop lastState = actor {                
-                let! msg = mailbox.Receive()
-
-                let handlePlayMovieMessage (message : PlayMovieMessage) : string =
-                    match lastState with
-                    | null | "" -> cprintfn ConsoleColor.Yellow "User is currently watching %s" message.MovieTitle
-                                   message.MovieTitle
-                    | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
-                           lastState
-
-                let handleStopMovieMessage (message : StopMovieMessage) : string =
-                    match lastState with
-                    | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
-                                   lastState
-                    | _ -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" lastState
-                           String.Empty
-
-                let newState = match msg with
-                               | PlayMovie pm -> handlePlayMovieMessage pm
-                               | StopMovie sm -> handleStopMovieMessage sm
-                               | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
-                                      mailbox.Unhandled msg
-                                      ""
-                return! loop newState
-            }
-            loop String.Empty
+        <| actorOf(moviePlayer(PlayMovie ({MovieTitle = "Codenan the Destroyer"; UserId = 42})))
         <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
