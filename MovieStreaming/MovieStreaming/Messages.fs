@@ -7,4 +7,8 @@
     // more functional definition
     type Message =
         | PlayMovie of PlayMovieMessage
-        | StopMovie of StopMovieMessage
+        | StopMovie
+
+    type ActorState =
+        | Playing of string
+        | Stopped of string

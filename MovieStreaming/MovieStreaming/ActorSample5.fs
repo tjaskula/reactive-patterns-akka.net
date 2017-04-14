@@ -33,7 +33,7 @@ let start8 system =
                     | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
                            lastState
 
-                let handleStopMovieMessage (message : StopMovieMessage) : string =
+                let handleStopMovieMessage () : string =
                     match lastState with
                     | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
                                    lastState
@@ -42,7 +42,7 @@ let start8 system =
 
                 let newState = match msg with
                                | PlayMovie pm -> handlePlayMovieMessage pm
-                               | StopMovie sm -> handleStopMovieMessage sm
+                               | StopMovie -> handleStopMovieMessage ()
                                | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                                       mailbox.Unhandled msg
                                       ""
@@ -106,12 +106,24 @@ let start10 (system : ActorSystem) =
     let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
 
     let rec moviePlayer lastState = function
-        | PlayMovie m -> cprintfn ConsoleColor.DarkYellow "PlayMovie" |> empty
-        | StopMovie m -> cprintfn ConsoleColor.DarkYellow "StopMovie" |> empty
+        | PlayMovie m -> 
+            match lastState with
+            | Playing _ -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
+            | Stopped t -> cprintfn ConsoleColor.Yellow "User is currently watching %s" t
+                           cprintfn ConsoleColor.Cyan "User Actor has now become Playing"
+            become (moviePlayer (Playing m.MovieTitle))        
+        | StopMovie -> 
+            match lastState with
+            | Playing t -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" t
+                           cprintfn ConsoleColor.Cyan "User Actor has now become Stopped"
+            | Stopped _ -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
+            become (moviePlayer (Stopped ""))                    
     
     let actor5'' = 
         spawnOvrd system "UserActorBecome"
-        <| actorOf(moviePlayer(PlayMovie ({MovieTitle = "Codenan the Destroyer"; UserId = 42})))
+        <| actorOf( cprintfn ConsoleColor.Gray "Creating a UserActor"
+                    cprintfn ConsoleColor.Cyan "Setting initial behavior to Stopped"
+                    moviePlayer (Stopped ""))
         <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
