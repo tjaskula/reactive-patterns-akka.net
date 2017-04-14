@@ -5,7 +5,7 @@ open Akka.FSharp
 open System
 
 open Actors
-open ComposeIt.Akka.FSharp.Extensions.Lifecycle
+open ComposeIt.Akka.FSharp.Extensions.Actor
 open ConsoleHelpers
 open Messages
 

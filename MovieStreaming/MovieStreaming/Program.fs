@@ -1,6 +1,6 @@
 ﻿open Akka.Actor
 open Akka.FSharp
-open ComposeIt.Akka.FSharp.Extensions.Lifecycle
+open ComposeIt.Akka.FSharp.Extensions.Actor
 open System
 
 open Actors
