@@ -106,8 +106,8 @@ let start10 (system : ActorSystem) =
     let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
 
     let rec moviePlayer lastState = function
-        | PlayMovie m -> cprintfn ConsoleColor.DarkYellow "PlayMovie"
-        | StopMovie m -> cprintfn ConsoleColor.DarkYellow "StopMovie"
+        | PlayMovie m -> cprintfn ConsoleColor.DarkYellow "PlayMovie" |> empty
+        | StopMovie m -> cprintfn ConsoleColor.DarkYellow "StopMovie" |> empty
     
     let actor5'' = 
         spawnOvrd system "UserActorBecome"
