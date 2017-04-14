@@ -2,6 +2,7 @@
 open Akka.FSharp
 open ComposeIt.Akka.FSharp.Extensions.Actor
 open System
+open System.Threading
 
 open Actors
 open ConsoleHelpers
@@ -12,9 +13,14 @@ let main argv =
 
     cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystel"
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
-    
 
+    cprintfn ConsoleColor.Gray "Creating actor supervisory hierarchy"
+    let props = Props.Create<PlaybackActor>()
+    let actor = system.ActorOf(props, "Playback")
+    
     let rec readConsole() =
+
+        Thread.Sleep(450)
 
         Console.WriteLine(Environment.NewLine)
         Console.WriteLine("Enter a command and hit enter")
