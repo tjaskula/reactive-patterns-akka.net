@@ -4,60 +4,42 @@ open ComposeIt.Akka.FSharp.Extensions.Actor
 open System
 
 open Actors
-open ActorConfiguration
 open ConsoleHelpers
 open Messages
 
 [<EntryPoint>]
 let main argv = 
 
+    cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystel"
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
-    cprintfn ConsoleColor.Gray "Actor system created."
+    
 
     let rec readConsole() =
 
         Console.WriteLine(Environment.NewLine)
-        Console.WriteLine("Which actor do you want to run? Or type 'Q' to exit...")
-        Console.WriteLine(Environment.NewLine)
-        // actor 1
-        Console.WriteLine("   1. Untyped basic actor F# Api")
-        // actor 1bis
-        Console.WriteLine("   2. Typed basic actor")
-        // actor 2
-        Console.WriteLine("   3. F# Api actor with strongly typed messages")
-        // actor 2bis
-        Console.WriteLine("   4. Actor with strongly typed messages")
-        // actor 3
-        Console.WriteLine("   5. F# Api Actor overriding lifecycles")
-        // actor 4
-        Console.WriteLine("   6. F# Api Stateful Actor with overriding lifecycles")
-        // actor 4bis
-        Console.WriteLine("   7. Stateful Actor with overriding lifecycles")
-        // actor 5
-        Console.WriteLine("   8. F# Api Stateful Actor with Become")
-        // actor 5bis
-        Console.WriteLine("   9. Stateful Actor with Become")
-        // actor 5ter
-        Console.WriteLine("   10. Stateful Actor with Become F# style")
+        Console.WriteLine("Enter a command and hit enter")
+        let command = Console.ReadLine()
+        
+        if command.StartsWith("play") then
+            let userId = command.Split(',').[1] |> int
+            let movieTitle = command.Split(',').[2]
 
-        let line = Console.ReadLine()
-        Console.WriteLine(Environment.NewLine)
+            let message = {MovieTitle = movieTitle; UserId = userId}
+            let aref = select "/user/Playback/UserCoordinator" system
+            aref <! message
 
-        if line = "Q" then ()
-        else
-            match line with
-            | "1" -> startActor system 1
-            | "2" -> startActor system 2
-            | "3" -> startActor system 3
-            | "4" -> startActor system 4
-            | "5" -> startActor system 5
-            | "6" -> startActor system 6
-            | "7" -> startActor system 7
-            | "8" -> startActor system 8
-            | "9" -> startActor system 9
-            | "10" -> startActor system 10
-            | _ -> Console.WriteLine "Choice not known"
             readConsole()
+
+        elif command.StartsWith("stop") then
+            let userId = command.Split(',').[1] |> int
+            let message = {UserId = userId}
+            let aref = select "/user/Playback/UserCoordinator" system
+            aref <! message
+
+            readConsole()
+
+        elif command.StartsWith("exit") then
+            ()
 
     readConsole()
 

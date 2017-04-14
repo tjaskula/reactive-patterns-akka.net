@@ -2,7 +2,7 @@
 
     type PlayMovieMessage = {MovieTitle : string; UserId : int}
 
-    type StopMovieMessage () = class end
+    type StopMovieMessage = {UserId : int}
 
     // more functional definition
     type Message =
