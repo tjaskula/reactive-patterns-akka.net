@@ -1,6 +1,5 @@
 ﻿open Akka.Actor
-open Akka.FSharp
-open ComposeIt.Akka.FSharp.Extensions.Actor
+open Akka.FSharp 
 open System
 open System.Threading
 

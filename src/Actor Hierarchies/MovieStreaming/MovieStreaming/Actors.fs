@@ -1,8 +1,7 @@
-﻿module Actors
+﻿module Actors 
     
     open Akka.Actor
     open Akka.FSharp
-    open Akka.Configuration
 
     open System
     open System.Collections.Generic
@@ -17,16 +16,22 @@
 
         do
             this.Receive<PlayMovieMessage>(fun (message : PlayMovieMessage) -> 
-                                                //createChildUserIfNotExists(message.UserId)
+                                                this.CreateChildUserIfNotExists(message.UserId)
                                                 let childActorRef = users.[message.UserId]
                                                 childActorRef <! message)
 
 
             this.Receive<StopMovieMessage>(fun (message : StopMovieMessage) ->
-                                                //CreateChildUserIfNotExists(message.UserId)
+                                                this.CreateChildUserIfNotExists(message.UserId)
                                                 let childActorRef = users.[message.UserId]
                                                 childActorRef <! message)
-               
+        
+        member private x.CreateChildUserIfNotExists userId =
+            if not (users.ContainsKey(userId)) then
+                let newChildActorRef = UserCoordinatorActor.Context.ActorOf(Props.Create(typeof<UserActor>, userId), "User" + userId.ToString())
+                users.Add(userId, newChildActorRef)
+            cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
+
         override __.PreStart() =
             cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreStart"
 
@@ -40,6 +45,49 @@
         override __.PostRestart e =
             cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostRestart because: %A" e
             base.PostRestart(e)
+
+    and UserActor(userId : int) as this =
+        inherit ReceiveActor()
+
+        let mutable currentlyWatching = String.Empty
+        let userId = userId
+
+        do this.Stopped()
+     
+        member private this.StartPlayingMovie title =
+            currentlyWatching <- title
+            cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId currentlyWatching
+            this.Become(this.Playing)
+
+        member private this.StopPlayingCurrentMovie() =
+            cprintfn ConsoleColor.Yellow "UserActor %i has stopped watching '%s'" userId currentlyWatching
+            currentlyWatching <- null
+            this.Become(this.Stopped)
+
+        member private this.Playing() =
+            this.Receive<PlayMovieMessage>((fun _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId))
+            this.Receive<StopMovieMessage>((fun _ -> this.StopPlayingCurrentMovie()))
+            cprintfn ConsoleColor.Yellow "UserActor %i has now become Playing" userId
+
+        member private this.Stopped() =
+            this.Receive<PlayMovieMessage>((fun message -> this.StartPlayingMovie message.MovieTitle))
+            this.Receive<StopMovieMessage>((fun _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot stop if nothing is playing" userId))
+            cprintfn ConsoleColor.Yellow "UserActor %i has now become Stopped" userId
+
+        override __.PreStart() =
+            cprintfn ConsoleColor.Yellow "UserActor %i PreStart" userId
+
+        override __.PostStop() =
+            cprintfn ConsoleColor.Yellow "UserActor %i PostStop" userId
+
+        override __.PreRestart (e, message) =
+            cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId e
+            base.PreRestart(e, message)
+
+        override __.PostRestart e =
+            cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  e
+            base.PostRestart(e)
+
 
     type PlaybackStatisticsActor() =
         inherit ReceiveActor()

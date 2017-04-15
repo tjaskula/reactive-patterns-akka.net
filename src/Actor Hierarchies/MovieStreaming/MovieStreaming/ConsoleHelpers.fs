@@ -2,8 +2,6 @@
 
     open System
 
-    open System
-
     let consolePrint c cwriter format =
         Printf.kprintf
             (fun s -> 
