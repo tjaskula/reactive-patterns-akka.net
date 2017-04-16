@@ -6,6 +6,8 @@
     open System
     open System.Collections.Generic
 
+    open ComposeIt.Akka.FSharp.Extensions.Actor
+
     open ConsoleHelpers
     open Messages
 
@@ -87,6 +89,23 @@
         override __.PostRestart e =
             cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  e
             base.PostRestart(e)
+
+
+    let rec moviePlayer lastState = function
+        | PlayMovie m -> 
+            match lastState with
+            | Playing _ -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
+            | Stopped t -> cprintfn ConsoleColor.Yellow "User is currently watching %s" t
+                           cprintfn ConsoleColor.Cyan "User Actor has now become Playing"
+            become (moviePlayer (Playing m.MovieTitle))        
+        | StopMovie -> 
+            match lastState with
+            | Playing t -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" t
+                           cprintfn ConsoleColor.Cyan "User Actor has now become Stopped"
+            | Stopped _ -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
+            become (moviePlayer (Stopped ""))                    
+    
+  
 
 
     type PlaybackStatisticsActor() =

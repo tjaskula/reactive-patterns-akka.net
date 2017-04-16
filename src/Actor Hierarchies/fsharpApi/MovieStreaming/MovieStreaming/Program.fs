@@ -2,6 +2,7 @@
 open Akka.FSharp 
 open System
 open System.Threading
+open ComposeIt.Akka.FSharp.Extensions.Actor
 
 open Actors
 open ConsoleHelpers
@@ -14,9 +15,35 @@ let main argv =
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
 
     cprintfn ConsoleColor.Gray "Creating actor supervisory hierarchy"
-    let props = Props.Create<PlaybackActor>()
-    let actor = system.ActorOf(props, "Playback")
     
+    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PreStart")
+    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PostStop")
+    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PreRestart because: %A" exn)
+    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PostRestart because: %A" exn)             
+    
+    let playback = 
+        spawnOvrd system "Playback"
+        <| fun parentMailbox ->
+            let child = 
+                spawn parentMailbox "child" 
+                    <| fun childMailbox ->
+                        childMailbox.Defer (fun () -> printfn "Child stopping")
+                        printfn "Child started"
+                        let rec childLoop() = actor {
+                            let! msg = childMailbox.Receive()
+                            return! childLoop()
+                        }
+                        childLoop()
+            cprintfn ConsoleColor.Gray "Creating parent actor..."
+            // define parent behavior
+            let rec loop() = actor {
+                let! msg = parentMailbox.Receive()
+                child.Forward(msg)  // forward all messages through
+                return! loop ()
+            }
+            loop ()
+        <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
+
     let rec readConsole() =
 
         Thread.Sleep(450)
