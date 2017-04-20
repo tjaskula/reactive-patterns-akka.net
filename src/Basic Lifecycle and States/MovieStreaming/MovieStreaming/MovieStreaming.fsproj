@@ -80,7 +80,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ComposeIt.Akka.FSharp.Extensions">
-      <HintPath>..\packages\Akka.NET.FSharp.API.Extensions.0.1.1.1\lib\net45\ComposeIt.Akka.FSharp.Extensions.dll</HintPath>
+      <HintPath>..\packages\Akka.NET.FSharp.API.Extensions.0.2.0\lib\net45\ComposeIt.Akka.FSharp.Extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.PowerPack">
