@@ -14,11 +14,6 @@ let start5 system =
     Console.WriteLine(Environment.NewLine)
     cprintfn ConsoleColor.Magenta "Starting new actor..."
 
-    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "Playback Actor 3 PreStart")
-    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "Playback Actor 3 PostStop")
-    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "Playback Actor PreRestart because: %A" exn)
-    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "Playback Actor PostRestart because: %A" exn)
-
     let actor3 = 
         spawn system "PlaybackActor3"
         <| fun mailbox ->
