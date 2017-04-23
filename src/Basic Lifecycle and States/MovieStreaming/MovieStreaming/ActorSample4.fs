@@ -14,17 +14,12 @@ let start6 system =
     Console.WriteLine(Environment.NewLine)
     cprintfn ConsoleColor.Magenta "Starting new actor..."
 
-    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PreStart")
-    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PostStop")
-    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn)
-    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
-
     let actor4 = 
-        spawnOvrd system "UserActor"
+        spawn system "UserActor"
         <| fun mailbox ->
             cprintfn ConsoleColor.Gray "Creating the actor 4..."
             let rec loop lastState = actor {                
-                let! (msg : obj) = mailbox.Receive()
+                let! msg = mailbox.Receive()
 
                 let handlePlayMovieMessage (message : PlayMovieMessage) : string =
                     match lastState with
@@ -33,7 +28,7 @@ let start6 system =
                     | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
                            lastState
 
-                let handleStopMovieMessage (message : StopMovieMessage) : string =
+                let handleStopMovieMessage () : string =
                     match lastState with
                     | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
                                    lastState
@@ -41,15 +36,21 @@ let start6 system =
                            String.Empty
 
                 let newState = match msg with
-                               | :? PlayMovieMessage as pmm -> handlePlayMovieMessage pmm
-                               | :? StopMovieMessage as smm -> handleStopMovieMessage smm
+                               | LifecycleEvent e ->
+                                    match e with
+                                    | PreStart -> cprintfn ConsoleColor.Green "UserActor PreStart"
+                                    | PostStop -> cprintfn ConsoleColor.Green "UserActor PostStop"
+                                    | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn
+                                    | PostRestart exn -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn
+                                    ""
+                               | PlayMovie pmm -> handlePlayMovieMessage pmm
+                               | StopMovie -> handleStopMovieMessage ()
                                | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                                       mailbox.Unhandled msg
                                       ""
                 return! loop newState
             }
             loop String.Empty
-        <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
