@@ -27,7 +27,7 @@ let start5 system =
                         | PostStop -> cprintfn ConsoleColor.Green "Playback Actor 3 PostStop"
                         | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "Playback Actor PreRestart because: %A" exn
                         | PostRestart exn -> cprintfn ConsoleColor.Green "Playback Actor PostRestart because: %A" exn
-                    | m as PlayMovieMessage when m.UserId > 40 -> cprintfn ConsoleColor.Yellow "Received movie title %s and User ID %i" m.MovieTitle m.UserId
+                    | PlayMovie m when m.UserId > 40 -> cprintfn ConsoleColor.Yellow "Received movie title %s and User ID %i" m.MovieTitle m.UserId
                     | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                            mailbox.Unhandled msg
                 return! loop()
