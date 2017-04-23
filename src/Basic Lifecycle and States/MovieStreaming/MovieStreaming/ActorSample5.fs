@@ -14,13 +14,8 @@ let start8 system =
     Console.WriteLine(Environment.NewLine)
     cprintfn ConsoleColor.Magenta "Starting new actor..."
 
-    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PreStart")
-    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PostStop")
-    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn)
-    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
-
     let actor5 = 
-        spawnOvrd system "UserActorBecome"
+        spawn system "UserActorBecome"
         <| fun mailbox ->
             cprintfn ConsoleColor.Gray "Creating the actor 5..."
             let rec loop lastState = actor {                
@@ -41,6 +36,13 @@ let start8 system =
                            String.Empty
 
                 let newState = match msg with
+                               | LifecycleEvent e ->
+                                    match e with
+                                    | PreStart -> cprintfn ConsoleColor.Green "UserActor PreStart"
+                                    | PostStop -> cprintfn ConsoleColor.Green "UserActor PostStop"
+                                    | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn
+                                    | PostRestart exn -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn
+                                    ""
                                | PlayMovie pm -> handlePlayMovieMessage pm
                                | StopMovie -> handleStopMovieMessage ()
                                | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
@@ -49,7 +51,6 @@ let start8 system =
                 return! loop newState
             }
             loop String.Empty
-        <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
@@ -100,11 +101,6 @@ let start10 (system : ActorSystem) =
     Console.WriteLine(Environment.NewLine)
     cprintfn ConsoleColor.Magenta "Starting new actor..."
 
-    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PreStart")
-    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "UserActor PostStop")
-    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn)
-    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn)
-
     let rec moviePlayer lastState = function
         | PlayMovie m -> 
             match lastState with
@@ -120,11 +116,10 @@ let start10 (system : ActorSystem) =
             become (moviePlayer (Stopped ""))                    
     
     let actor5'' = 
-        spawnOvrd system "UserActorBecome"
+        spawn system "UserActorBecome"
         <| actorOf( cprintfn ConsoleColor.Gray "Creating a UserActor"
                     cprintfn ConsoleColor.Cyan "Setting initial behavior to Stopped"
                     moviePlayer (Stopped ""))
-        <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
