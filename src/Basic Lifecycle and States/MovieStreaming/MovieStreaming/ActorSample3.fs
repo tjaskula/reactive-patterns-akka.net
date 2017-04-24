@@ -21,7 +21,7 @@ let start5 system =
             let rec loop() = actor {                
                 let! (msg: obj) = mailbox.Receive()
                 match msg with
-                    | :? LifecycleMessage as e ->
+                    | LifecycleEvent e ->
                         match e with
                         | PreStart -> cprintfn ConsoleColor.Green "Playback Actor 3 PreStart"
                         | PostStop -> cprintfn ConsoleColor.Green "Playback Actor 3 PostStop"
