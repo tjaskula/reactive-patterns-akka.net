@@ -1,7 +1,7 @@
-﻿#I "../packages/Newtonsoft.Json.8.0.3/lib/net45/"
-#r "../packages/Akka.1.0.8/lib/net45/Akka.dll"
-#r "../packages/Akka.FSharp.1.0.8/lib/net45/Akka.FSharp.dll"
-#r "../packages/FsPickler.2.2.0/lib/net45/FsPickler.dll"
+﻿#I "bin/Debug/"
+#r "Akka.dll"
+#r "Akka.FSharp.dll"
+#r "FsPickler.dll"
 #r "Newtonsoft.Json.dll"
 
 open Akka.FSharp
@@ -19,8 +19,8 @@ type SomeActor() =
         match message with
         | :? SomeActorMessages as m ->  
             match m with
-            | Greet(name) -> printfn "Hello in actor %s" name
-            | Hi -> printfn "Hello from actor F#!"
+            | Greet(name) -> Console.WriteLine("Hello {0}", name)
+            | Hi -> Console.WriteLine("Hello from F#!")
         | _ -> failwith "unknown message"
 
 let main() =
