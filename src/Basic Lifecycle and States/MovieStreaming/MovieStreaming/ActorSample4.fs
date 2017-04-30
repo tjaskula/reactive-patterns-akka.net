@@ -36,15 +36,17 @@ let start6 system =
                            String.Empty
 
                 let newState = match msg with
-                               | LifecycleEvent e ->
+                               | Lifecycle e ->
                                     match e with
                                     | PreStart -> cprintfn ConsoleColor.Green "UserActor PreStart"
                                     | PostStop -> cprintfn ConsoleColor.Green "UserActor PostStop"
                                     | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn
                                     | PostRestart exn -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn
                                     ""
-                               | PlayMovie pmm -> handlePlayMovieMessage pmm
-                               | StopMovie -> handleStopMovieMessage ()
+                               | Message m ->
+                                    match m with
+                                    | PlayMovie pmm -> handlePlayMovieMessage pmm
+                                    | StopMovie -> handleStopMovieMessage ()
                                | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                                       mailbox.Unhandled msg
                                       ""
