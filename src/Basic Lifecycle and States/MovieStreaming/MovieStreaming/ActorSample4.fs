@@ -56,19 +56,19 @@ let start6 system =
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Codenan the Destroyer)" 
-    actor4 <! {MovieTitle = "Codenan the Destroyer"; UserId = 42}
+    actor4 <! PlayMovie({MovieTitle = "Codenan the Destroyer"; UserId = 42})
     
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a PlayMovieMessage (Boolean Lies)" 
-    actor4 <! {MovieTitle = "Boolean Lies"; UserId = 42}
+    actor4 <! PlayMovie({MovieTitle = "Boolean Lies"; UserId = 42})
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a StopMovieMessage" 
-    actor4 <! StopMovieMessage()
+    actor4 <! StopMovie
 
     Console.ReadKey() |> ignore
     cprintfn ConsoleColor.Blue "Sending a another StopMovieMessage" 
-    actor4 <! StopMovieMessage()
+    actor4 <! StopMovie
 
     Console.ReadKey() |> ignore
 
