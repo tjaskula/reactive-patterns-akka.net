@@ -22,7 +22,7 @@ let main argv =
     let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PostRestart because: %A" exn)             
     
     let playback = 
-        spawnOvrd system "Playback"
+        spawn system "Playback"
         <| fun parentMailbox ->
             let child = 
                 spawn parentMailbox "child" 
@@ -42,7 +42,6 @@ let main argv =
                 return! loop ()
             }
             loop ()
-        <| {defOvrd with PreStart = preStart; PostStop = postStop; PreRestart = preRestart; PostRestart = postRestart}
 
     let rec readConsole() =
 
