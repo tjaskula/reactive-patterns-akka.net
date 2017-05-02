@@ -21,7 +21,7 @@ let start3 system =
                 let! (msg : PlayMovieMessage) = mailbox.Receive()
                 match msg with // This filter is similar to this.Receive<PlayMovieMessage>((fun message -> this.HandlePlayMovieMessage message), (fun message -> message.UserId > 40)) which will be invoked also when message should be handled.
                     | m when m.UserId > 40 -> cprintfn ConsoleColor.Yellow "Received movie title %s and User ID %i" m.MovieTitle m.UserId
-                    | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
+                    | _ -> cprintfn ConsoleColor.Red "Unhandled message..."
                            mailbox.Unhandled msg
                 return! loop()
             }
