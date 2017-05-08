@@ -10,7 +10,7 @@ open Messages
 [<EntryPoint>]
 let main argv = 
 
-    cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystel"
+    cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystem"
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
 
     cprintfn ConsoleColor.Gray "Creating actor supervisory hierarchy"
