@@ -11,34 +11,61 @@ open Messages
 [<EntryPoint>]
 let main argv = 
 
-    cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystel"
+    cprintfn ConsoleColor.Gray "Creating MovieStreamingActorSystem"
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
 
     cprintfn ConsoleColor.Gray "Creating actor supervisory hierarchy"
     
-    let preStart = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PreStart")
-    let postStop = Some(fun (baseFn : unit -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PostStop")
-    let preRestart = Some(fun (baseFn : exn * obj -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PreRestart because: %A" exn)
-    let postRestart = Some(fun (baseFn : exn -> unit) -> cprintfn ConsoleColor.Green "PlaybackActor PostRestart because: %A" exn)             
-    
     let playback = 
         spawn system "Playback"
-        <| fun parentMailbox ->
-            let child = 
-                spawn parentMailbox "child" 
-                    <| fun childMailbox ->
-                        childMailbox.Defer (fun () -> printfn "Child stopping")
-                        printfn "Child started"
-                        let rec childLoop() = actor {
-                            let! msg = childMailbox.Receive()
-                            return! childLoop()
+        <| fun playbackMailbox ->
+            let userCoordinator = 
+                spawn playbackMailbox "UserCoordinator" 
+                    <| fun userCoordinatorMailbox ->
+                        let rec userCoordinatorLoop() = actor {
+                            let! msg = userCoordinatorMailbox.Receive()
+                            match msg with
+                            | Lifecycle evt ->
+                                match evt with
+                                | PreStart -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreStart"
+                                | PostStop -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostStop"
+                                | PreRestart(e, _) -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreRestart because: %A" e
+                                | PostRestart e -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostRestart because: %A" e
+                            | _ -> ()
+                            return! userCoordinatorLoop()
                         }
-                        childLoop()
+                        userCoordinatorLoop()
+            let playbackStatistics =
+                spawn playbackMailbox "PlaybackStatistics" 
+                    <| fun playbackStatisticsMailbox ->
+                        let rec playbackStatisticsLoop() = actor {
+                            let! msg = playbackStatisticsMailbox.Receive()
+                            match msg with
+                            | Lifecycle evt ->
+                                match evt with
+                                | PreStart -> cprintfn ConsoleColor.White "PlaybackStatisticsActor PreStart"
+                                | PostStop -> cprintfn ConsoleColor.White "PlaybackStatisticsActor PostStop"
+                                | PreRestart(e, _) -> cprintfn ConsoleColor.White "PlaybackStatisticsActor PreRestart because: %A" e
+                                | PostRestart e -> cprintfn ConsoleColor.White "PlaybackStatisticsActor PostRestart because: %A" e
+                            | _ -> ()
+                            return! playbackStatisticsLoop()
+                        }
+                        playbackStatisticsLoop()
             cprintfn ConsoleColor.Gray "Creating parent actor..."
             // define parent behavior
             let rec loop() = actor {
-                let! msg = parentMailbox.Receive()
-                child.Forward(msg)  // forward all messages through
+                let! msg = playbackMailbox.Receive()
+                match msg with
+                | Lifecycle evt ->
+                    match evt with
+                    | PreStart -> cprintfn ConsoleColor.Green "PlaybackActor PreStart"
+                    | PostStop -> cprintfn ConsoleColor.Green "PlaybackActor PostStop"
+                    | PreRestart(e, _) -> cprintfn ConsoleColor.Green "PlaybackActor PreRestart because: %A" e
+                    | PostRestart e -> cprintfn ConsoleColor.Green "PlaybackActor PostRestart because: %A" e
+                | Message m ->
+                    userCoordinator.Forward(m)  // forward all messages through
+                    playbackStatistics.Forward(m)
+                | _ -> playbackMailbox.Unhandled msg
                 return! loop ()
             }
             loop ()
