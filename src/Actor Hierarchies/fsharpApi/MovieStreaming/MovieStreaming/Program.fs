@@ -22,7 +22,16 @@ let main argv =
             let userCoordinator = 
                 spawn playbackMailbox "UserCoordinator" 
                     <| fun userCoordinatorMailbox ->
-                        let rec userCoordinatorLoop() = actor {
+                        let rec userCoordinatorLoop (users: Map<int, IActorRef>) = actor {
+
+                            let createChildUserIfNotExists userId =
+                                if not (users.ContainsKey userId) then
+                                    let user = 
+                                        spawn userCoordinatorMailbox (sprintf "User%i" userId)
+                                        <| actorOf(fun _ -> empty)
+                                    ()
+                                ()
+
                             let! msg = userCoordinatorMailbox.Receive()
                             match msg with
                             | Lifecycle evt ->
@@ -31,10 +40,14 @@ let main argv =
                                 | PostStop -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostStop"
                                 | PreRestart(e, _) -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreRestart because: %A" e
                                 | PostRestart e -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostRestart because: %A" e
-                            | _ -> ()
-                            return! userCoordinatorLoop()
+                            | Message m ->
+                                match m with
+                                | PlayMovie pmm -> ()
+                                | StopMovie -> ()
+                            | _ -> userCoordinatorMailbox.Unhandled msg
+                            return! userCoordinatorLoop users
                         }
-                        userCoordinatorLoop()
+                        userCoordinatorLoop Map.empty
             let playbackStatistics =
                 spawn playbackMailbox "PlaybackStatistics" 
                     <| fun playbackStatisticsMailbox ->
@@ -51,7 +64,7 @@ let main argv =
                             return! playbackStatisticsLoop()
                         }
                         playbackStatisticsLoop()
-            cprintfn ConsoleColor.Gray "Creating parent actor..."
+            
             // define parent behavior
             let rec loop() = actor {
                 let! msg = playbackMailbox.Receive()
