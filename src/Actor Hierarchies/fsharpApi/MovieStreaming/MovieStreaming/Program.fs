@@ -29,23 +29,37 @@ let main argv =
                                     let user = 
                                         spawn userCoordinatorMailbox (sprintf "User%i" userId)
                                         <| actorOf(fun _ -> empty)
-                                    ()
-                                ()
+                                    let newUsers = users.Add (userId, user)
+                                    cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
+                                    newUsers
+                                else users
 
                             let! msg = userCoordinatorMailbox.Receive()
-                            match msg with
-                            | Lifecycle evt ->
-                                match evt with
-                                | PreStart -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreStart"
-                                | PostStop -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostStop"
-                                | PreRestart(e, _) -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreRestart because: %A" e
-                                | PostRestart e -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostRestart because: %A" e
-                            | Message m ->
-                                match m with
-                                | PlayMovie pmm -> ()
-                                | StopMovie -> ()
-                            | _ -> userCoordinatorMailbox.Unhandled msg
-                            return! userCoordinatorLoop users
+                            
+                            let newUsers = 
+                                match msg with
+                                | Lifecycle evt ->
+                                    match evt with
+                                    | PreStart -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreStart"
+                                    | PostStop -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostStop"
+                                    | PreRestart(e, _) -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PreRestart because: %A" e
+                                    | PostRestart e -> cprintfn ConsoleColor.Cyan "UserCoordinatorActor PostRestart because: %A" e
+                                    users
+                                | Message m ->
+                                    match m with
+                                    | PlayMovie pmm -> 
+                                        let newUsers = createChildUserIfNotExists pmm.UserId
+                                        let childActorRef = users.[pmm.UserId]
+                                        childActorRef <! pmm
+                                        newUsers
+                                    | StopMovie smm ->
+                                        let newUsers = createChildUserIfNotExists smm.UserId
+                                        let childActorRef = users.[smm.UserId]
+                                        childActorRef <! smm
+                                        newUsers
+                                | _ -> userCoordinatorMailbox.Unhandled msg
+                                       users
+                            return! userCoordinatorLoop newUsers
                         }
                         userCoordinatorLoop Map.empty
             let playbackStatistics =
