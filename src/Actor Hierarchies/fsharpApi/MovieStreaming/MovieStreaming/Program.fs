@@ -28,7 +28,11 @@ let main argv =
                                 if not (users.ContainsKey userId) then
                                     let user = 
                                         spawn userCoordinatorMailbox (sprintf "User%i" userId)
-                                        <| actorOf(fun _ -> empty)
+                                            <| fun userMailbox ->
+                                                let rec userLoop userId = actor {
+                                                    return! userLoop 1
+                                                }
+                                                userLoop 0
                                     let newUsers = users.Add (userId, user)
                                     cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
                                     newUsers
