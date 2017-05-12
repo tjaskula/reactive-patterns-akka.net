@@ -98,7 +98,7 @@
             | Stopped t -> cprintfn ConsoleColor.Yellow "User is currently watching %s" t
                            cprintfn ConsoleColor.Cyan "User Actor has now become Playing"
             become (moviePlayer (Playing m.MovieTitle))        
-        | StopMovie -> 
+        | StopMovie s -> 
             match lastState with
             | Playing t -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" t
                            cprintfn ConsoleColor.Cyan "User Actor has now become Stopped"
