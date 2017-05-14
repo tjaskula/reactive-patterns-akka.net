@@ -30,9 +30,9 @@ let main argv =
                                         spawn userCoordinatorMailbox (sprintf "User%i" userId)
                                             <| fun userMailbox ->
                                                 let rec userLoop userId = actor {
-                                                    return! userLoop 1
+                                                    return! userLoop userId
                                                 }
-                                                userLoop 0
+                                                userLoop userId
                                     let newUsers = users.Add (userId, user)
                                     cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
                                     newUsers
