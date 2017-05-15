@@ -29,10 +29,41 @@ let main argv =
                                     let user = 
                                         spawn userCoordinatorMailbox (sprintf "User%i" userId)
                                             <| fun userMailbox ->
-                                                let rec userLoop userId = actor {
-                                                    return! userLoop userId
+                                                let rec userLoop lastState = actor {
+                                                    let! msg = userMailbox.Receive()
+
+                                                    let handlePlayMovieMessage (message : PlayMovieMessage) : string =
+                                                        match lastState with
+                                                        | null | "" -> cprintfn ConsoleColor.Yellow "User is currently watching %s" message.MovieTitle
+                                                                       message.MovieTitle
+                                                        | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
+                                                               lastState
+
+                                                    let handleStopMovieMessage () : string =
+                                                        match lastState with
+                                                        | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
+                                                                       lastState
+                                                        | _ -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" lastState
+                                                               String.Empty
+
+                                                    let newState = match msg with
+                                                                   | Lifecycle e ->
+                                                                        match e with
+                                                                        | PreStart -> cprintfn ConsoleColor.Green "UserActor PreStart"
+                                                                        | PostStop -> cprintfn ConsoleColor.Green "UserActor PostStop"
+                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn
+                                                                        | PostRestart exn -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn
+                                                                        ""
+                                                                   | Message m ->
+                                                                        match m with
+                                                                        | PlayMovie pm -> handlePlayMovieMessage pm
+                                                                        | StopMovie sm -> handleStopMovieMessage ()
+                                                                   | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
+                                                                          userMailbox.Unhandled msg
+                                                                          ""
+                                                    return! userLoop newState
                                                 }
-                                                userLoop userId
+                                                userLoop String.Empty
                                     let newUsers = users.Add (userId, user)
                                     cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
                                     newUsers
