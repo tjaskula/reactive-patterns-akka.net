@@ -34,25 +34,25 @@ let main argv =
 
                                                     let handlePlayMovieMessage (message : PlayMovieMessage) : string =
                                                         match lastState with
-                                                        | null | "" -> cprintfn ConsoleColor.Yellow "User is currently watching %s" message.MovieTitle
+                                                        | null | "" -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId lastState
                                                                        message.MovieTitle
-                                                        | t -> cprintfn ConsoleColor.Red "Error: cannot start playing another movie before stopping existing one"
+                                                        | t -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId
                                                                lastState
 
                                                     let handleStopMovieMessage () : string =
                                                         match lastState with
-                                                        | null | "" -> cprintfn ConsoleColor.Red "Error: cannot stop if nothing is playing"
+                                                        | null | "" -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot stop if nothing is playing" userId
                                                                        lastState
-                                                        | _ -> cprintfn ConsoleColor.Yellow "User has stopped watching %s" lastState
+                                                        | _ -> cprintfn ConsoleColor.Yellow "UserActor %i has stopped watching '%s'" userId lastState
                                                                String.Empty
 
                                                     let newState = match msg with
                                                                    | Lifecycle e ->
                                                                         match e with
-                                                                        | PreStart -> cprintfn ConsoleColor.Green "UserActor PreStart"
-                                                                        | PostStop -> cprintfn ConsoleColor.Green "UserActor PostStop"
-                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Green "UserActor PreRestart because: %A" exn
-                                                                        | PostRestart exn -> cprintfn ConsoleColor.Green "UserActor PostRestart because: %A" exn
+                                                                        | PreStart -> cprintfn ConsoleColor.Yellow "UserActor %i PreStart" userId
+                                                                        | PostStop -> cprintfn ConsoleColor.Yellow "UserActor %i PostStop" userId
+                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId e
+                                                                        | PostRestart exn -> cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  e
                                                                         ""
                                                                    | Message m ->
                                                                         match m with
