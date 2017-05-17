@@ -36,7 +36,7 @@ let main argv =
                                                         match lastState with
                                                         | null | "" -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId lastState
                                                                        message.MovieTitle
-                                                        | t -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId
+                                                        | _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId
                                                                lastState
 
                                                     let handleStopMovieMessage () : string =
@@ -51,13 +51,13 @@ let main argv =
                                                                         match e with
                                                                         | PreStart -> cprintfn ConsoleColor.Yellow "UserActor %i PreStart" userId
                                                                         | PostStop -> cprintfn ConsoleColor.Yellow "UserActor %i PostStop" userId
-                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId e
-                                                                        | PostRestart exn -> cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  e
+                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId exn
+                                                                        | PostRestart exn -> cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  exn
                                                                         ""
                                                                    | Message m ->
                                                                         match m with
                                                                         | PlayMovie pm -> handlePlayMovieMessage pm
-                                                                        | StopMovie sm -> handleStopMovieMessage ()
+                                                                        | StopMovie _ -> handleStopMovieMessage ()
                                                                    | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
                                                                           userMailbox.Unhandled msg
                                                                           ""
@@ -93,6 +93,7 @@ let main argv =
                                         childActorRef <! smm
                                         newUsers
                                 | _ -> userCoordinatorMailbox.Unhandled msg
+                                       cprintfn ConsoleColor.Red "UserCoordinatorActor unhandled message '%A'" msg
                                        users
                             return! userCoordinatorLoop newUsers
                         }
@@ -124,9 +125,9 @@ let main argv =
                     | PostStop -> cprintfn ConsoleColor.Green "PlaybackActor PostStop"
                     | PreRestart(e, _) -> cprintfn ConsoleColor.Green "PlaybackActor PreRestart because: %A" e
                     | PostRestart e -> cprintfn ConsoleColor.Green "PlaybackActor PostRestart because: %A" e
-                | Message m ->
-                    userCoordinator.Forward(m)  // forward all messages through
-                    playbackStatistics.Forward(m)
+                | Message _ ->
+                    userCoordinator.Forward(msg)  // forward all messages through
+                    playbackStatistics.Forward(msg)
                 | _ -> playbackMailbox.Unhandled msg
                 return! loop ()
             }
@@ -144,7 +145,7 @@ let main argv =
             let userId = command.Split(',').[1] |> int
             let movieTitle = command.Split(',').[2]
 
-            let message = {MovieTitle = movieTitle; UserId = userId}
+            let message = PlayMovie {MovieTitle = movieTitle; UserId = userId}
             let aref = select "/user/Playback/UserCoordinator" system
             aref <! message
 
@@ -152,7 +153,7 @@ let main argv =
 
         elif command.StartsWith("stop") then
             let userId = command.Split(',').[1] |> int
-            let message = {UserId = userId}
+            let message = StopMovie {UserId = userId}
             let aref = select "/user/Playback/UserCoordinator" system
             aref <! message
 
