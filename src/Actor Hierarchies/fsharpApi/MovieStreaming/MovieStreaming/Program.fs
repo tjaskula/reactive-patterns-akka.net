@@ -34,7 +34,7 @@ let main argv =
 
                                                     let handlePlayMovieMessage (message : PlayMovieMessage) : string =
                                                         match lastState with
-                                                        | null | "" -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId lastState
+                                                        | null | "" -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId message.MovieTitle
                                                                        message.MovieTitle
                                                         | _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId
                                                                lastState
@@ -58,14 +58,14 @@ let main argv =
                                                                         match m with
                                                                         | PlayMovie pm -> handlePlayMovieMessage pm
                                                                         | StopMovie _ -> handleStopMovieMessage ()
-                                                                   | _ -> cprintfn ConsoleColor.Red "Unhadled message..."
+                                                                   | _ -> cprintfn ConsoleColor.Red "Unhandled message..."
                                                                           userMailbox.Unhandled msg
                                                                           ""
                                                     return! userLoop newState
                                                 }
                                                 userLoop String.Empty
                                     let newUsers = users.Add (userId, user)
-                                    cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId users.Count
+                                    cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId newUsers.Count
                                     newUsers
                                 else users
 
@@ -84,13 +84,13 @@ let main argv =
                                     match m with
                                     | PlayMovie pmm -> 
                                         let newUsers = createChildUserIfNotExists pmm.UserId
-                                        let childActorRef = users.[pmm.UserId]
-                                        childActorRef <! pmm
+                                        let childActorRef = newUsers.[pmm.UserId]
+                                        childActorRef <! m
                                         newUsers
                                     | StopMovie smm ->
                                         let newUsers = createChildUserIfNotExists smm.UserId
-                                        let childActorRef = users.[smm.UserId]
-                                        childActorRef <! smm
+                                        let childActorRef = newUsers.[smm.UserId]
+                                        childActorRef <! m
                                         newUsers
                                 | _ -> userCoordinatorMailbox.Unhandled msg
                                        cprintfn ConsoleColor.Red "UserCoordinatorActor unhandled message '%A'" msg
