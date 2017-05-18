@@ -4,7 +4,6 @@ open System
 open System.Threading
 open ComposeIt.Akka.FSharp.Extensions.Actor
 
-open Actors
 open ConsoleHelpers
 open Messages
 
@@ -15,6 +14,30 @@ let main argv =
     let system = System.create "MovieStreamingActorSystem" <| Configuration.load()
 
     cprintfn ConsoleColor.Gray "Creating actor supervisory hierarchy"
+
+    let rec moviePlayer userId lastState = function
+        | Lifecycle e ->
+            match e with
+            | PreStart -> cprintfn ConsoleColor.Yellow "UserActor %i PreStart" userId
+            | PostStop -> cprintfn ConsoleColor.Yellow "UserActor %i PostStop" userId
+            | PreRestart (exn, _) -> cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId exn
+            | PostRestart exn -> cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  exn
+            become (moviePlayer userId (Stopped ""))
+        | Message m ->
+            match m with
+            | PlayMovie p -> 
+                match lastState with
+                | Playing _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" p.UserId
+                | Stopped _ -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" p.UserId p.MovieTitle
+                               cprintfn ConsoleColor.Cyan "UserActor %i has now become Playing" p.UserId
+                become (moviePlayer userId (Playing p.MovieTitle))        
+            | StopMovie s -> 
+                match lastState with
+                | Playing t -> cprintfn ConsoleColor.Yellow "UserActor %i has stopped watching '%s'" s.UserId t
+                               cprintfn ConsoleColor.Cyan "UserActor %i has now become Stopped" s.UserId
+                | Stopped _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot stop if nothing is playing" s.UserId
+                become (moviePlayer userId (Stopped ""))
+        | _ -> become (moviePlayer userId (Stopped ""))
     
     let playback = 
         spawn system "Playback"
@@ -23,47 +46,13 @@ let main argv =
                 spawn playbackMailbox "UserCoordinator" 
                     <| fun userCoordinatorMailbox ->
                         let rec userCoordinatorLoop (users: Map<int, IActorRef>) = actor {
-
                             let createChildUserIfNotExists userId =
                                 if not (users.ContainsKey userId) then
                                     let user = 
                                         spawn userCoordinatorMailbox (sprintf "User%i" userId)
-                                            <| fun userMailbox ->
-                                                let rec userLoop lastState = actor {
-                                                    let! msg = userMailbox.Receive()
-
-                                                    let handlePlayMovieMessage (message : PlayMovieMessage) : string =
-                                                        match lastState with
-                                                        | null | "" -> cprintfn ConsoleColor.Yellow "UserActor %i is currently watching '%s'" userId message.MovieTitle
-                                                                       message.MovieTitle
-                                                        | _ -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot start playing another movie before stopping existing one" userId
-                                                               lastState
-
-                                                    let handleStopMovieMessage () : string =
-                                                        match lastState with
-                                                        | null | "" -> cprintfn ConsoleColor.Red "UserActor %i Error: cannot stop if nothing is playing" userId
-                                                                       lastState
-                                                        | _ -> cprintfn ConsoleColor.Yellow "UserActor %i has stopped watching '%s'" userId lastState
-                                                               String.Empty
-
-                                                    let newState = match msg with
-                                                                   | Lifecycle e ->
-                                                                        match e with
-                                                                        | PreStart -> cprintfn ConsoleColor.Yellow "UserActor %i PreStart" userId
-                                                                        | PostStop -> cprintfn ConsoleColor.Yellow "UserActor %i PostStop" userId
-                                                                        | PreRestart (exn, _) -> cprintfn ConsoleColor.Yellow "UserActor %i PreRestart because: %A" userId exn
-                                                                        | PostRestart exn -> cprintfn ConsoleColor.Yellow "UserActor %i PostRestart because: %A" userId  exn
-                                                                        ""
-                                                                   | Message m ->
-                                                                        match m with
-                                                                        | PlayMovie pm -> handlePlayMovieMessage pm
-                                                                        | StopMovie _ -> handleStopMovieMessage ()
-                                                                   | _ -> cprintfn ConsoleColor.Red "Unhandled message..."
-                                                                          userMailbox.Unhandled msg
-                                                                          ""
-                                                    return! userLoop newState
-                                                }
-                                                userLoop String.Empty
+                                            <| actorOf(cprintfn ConsoleColor.Gray "Creating a UserActor %i" userId
+                                                       cprintfn ConsoleColor.Cyan "UserActor %i: Setting initial behavior to Stopped" userId
+                                                       moviePlayer userId (Stopped ""))
                                     let newUsers = users.Add (userId, user)
                                     cprintfn ConsoleColor.Cyan "UserCoordinatorActor created new child UserActor for %i (Total Users: %i)" userId newUsers.Count
                                     newUsers
