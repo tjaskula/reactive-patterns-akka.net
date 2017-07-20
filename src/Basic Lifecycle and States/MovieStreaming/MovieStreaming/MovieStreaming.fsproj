@@ -72,11 +72,19 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Akka">
-      <HintPath>..\packages\Akka.1.2.0\lib\net45\Akka.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\Akka.1.2.3\lib\net45\Akka.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Akka.FSharp">
-      <HintPath>..\packages\Akka.FSharp.1.2.0\lib\net45\Akka.FSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\Akka.FSharp.1.2.3\lib\net45\Akka.FSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ComposeIt.Akka.FSharp.Extensions">
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\Akka.NET.FSharp.API.Extensions.0.2.5\lib\net45\ComposeIt.Akka.FSharp.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\FSharp.Core.4.1.17\lib\net45\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.PowerPack">
@@ -88,15 +96,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FsPickler">
-      <HintPath>..\packages\FsPickler.2.4.0\lib\net45\FsPickler.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\FsPickler.3.3.0\lib\net45\FsPickler.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -108,6 +113,10 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\..\..\..\..\..\..\Users\T.Jaskula\AppData\Roaming\NuGet\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
