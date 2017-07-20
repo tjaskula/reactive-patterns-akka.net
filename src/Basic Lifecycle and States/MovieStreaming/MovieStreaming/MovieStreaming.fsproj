@@ -79,10 +79,6 @@
       <HintPath>..\packages\Akka.FSharp.1.2.0\lib\net45\Akka.FSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ComposeIt.Akka.FSharp.Extensions">
-      <HintPath>..\packages\Akka.NET.FSharp.API.Extensions.0.2.4\lib\net45\ComposeIt.Akka.FSharp.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="FSharp.PowerPack">
       <HintPath>..\packages\FSPowerPack.Core.Community.3.0.0.0\lib\Net40\FSharp.PowerPack.dll</HintPath>
       <Private>True</Private>
